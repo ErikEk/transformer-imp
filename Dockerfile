@@ -1,0 +1,10 @@
+FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime
+WORKDIR /app
+COPY ./requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+#COPY ./source ./source
+COPY ./train.py ./train.py
+#RUN apt-get install -y libx11-dev
+#RUN apt-get install -y python3-tk
+VOLUME /app
+#EXPOSE 8888
