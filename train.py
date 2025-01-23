@@ -23,4 +23,20 @@ import torch
 data = torch.tensor(encode(text), dtype=torch.long)
 print(data.shape, data.dtype)
 print(data[:1000])
-print("ss")
+
+
+n = int(0.9*len(data))
+train_data = data[:n]
+val_data = data[n:]
+
+
+block_size= 8
+train_data[:block_size+1]
+
+x = train_data[:block_size]
+y = train_data[1:block_size+1]
+for t in range(block_size):
+    context = x[:t+1]
+    target = y[t]
+    print(f"When inpuit is {context} the target is: {target}")
+
