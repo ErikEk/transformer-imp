@@ -18,7 +18,23 @@ print(encode("hi there"))
 print(decode(encode("hi there")))
 
 import torch
+
+
+if torch.cuda.is_available():
+    print(f"GPU: {torch.cuda.get_device_name(0)} is available.")
+else:
+    print("No GPU available. Training will run on CPU.")
+
+
+print(torch.__version__)  # Should return 2.4.0
+print(torch.cuda.is_available())  # Should return True
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
 data = torch.tensor(encode(text), dtype=torch.long)
+data = data.to(device) # Remove?
+
 print(data.shape, data.dtype)
 print(data[:1000])
 
@@ -50,7 +66,8 @@ def get_batch(split):
     ix = torch.randint(len(data) - block_size, (batch_size,))
     x = torch.stack([data[i:i+block_size] for i in ix])
     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
-
+    x = x.to(device)
+    y = y.to(device)
     return x, y
 
 xb, yb = get_batch('train')
@@ -70,15 +87,10 @@ for b in range(batch_size): # batch dimension
         target = yb[b,t]
         print(f"when input is {context.tolist()} the target: {target}")
 
-
 import torch.nn as nn
 from torch.nn import functional as F
 torch.manual_seed(1337)
 
-if torch.cuda.is_available():
-    print(f"GPU: {torch.cuda.get_device_name(0)} is available.")
-else:
-    print("No GPU available. Training will run on CPU.")
 
 class BigramLanguageModel(nn.Module):
 
@@ -117,17 +129,20 @@ class BigramLanguageModel(nn.Module):
         return idx
 
 m = BigramLanguageModel(vocab_size)
+m.to(device) # Remove??
 logits, loss = m(xb,yb)
 print(logits.shape)
 print(loss)
 
 
-print(decode(m.generate(idx = torch.zeros((1,1), dtype=torch.long), max_new_tokens=100)[0].tolist()))
+idx = torch.zeros((1,1), dtype=torch.long)
+idx = idx.to(device)
+print(decode(m.generate(idx, max_new_tokens=100)[0].tolist()))
 
 optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
 
 batch_size = 32
-for steps in range(1000):
+for steps in range(10000):
     # sample a batch of data
     xb, yb = get_batch('train')
 
@@ -138,5 +153,6 @@ for steps in range(1000):
     optimizer.step()
 
 print(loss.item())
-
-print(decode(m.generate(idx = torch.zeros((1,1), dtype=torch.long), max_new_tokens=300)[0].tolist()))
+idx = torch.zeros((1,1), dtype=torch.long)
+idx = idx.to(device)
+print(decode(m.generate(idx, max_new_tokens=300)[0].tolist()))
