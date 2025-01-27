@@ -96,7 +96,7 @@ class BigramLanguageModel(nn.Module):
 
     def __init__(self, vocal_size):
         super().__init__()
-        # each tocken directly reads off the logits for the next token from a lookup table
+        # each token directly reads of the logits for the next token from a lookup table
         self.token_embedding_table = nn.Embedding(vocab_size, vocab_size)
 
     def forward(self, idx, targets=None):
