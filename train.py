@@ -18,7 +18,9 @@ print(encode("hi there"))
 print(decode(encode("hi there")))
 
 import torch
-
+import torch.nn as nn
+from torch.nn import functional as F
+torch.manual_seed(1337)
 
 if torch.cuda.is_available():
     print(f"GPU: {torch.cuda.get_device_name(0)} is available.")
@@ -86,11 +88,6 @@ for b in range(batch_size): # batch dimension
         context = xb[b, :t+1]
         target = yb[b,t]
         print(f"when input is {context.tolist()} the target: {target}")
-
-import torch.nn as nn
-from torch.nn import functional as F
-torch.manual_seed(1337)
-
 
 class BigramLanguageModel(nn.Module):
 
