@@ -28,7 +28,7 @@ vocab_size = len(chars)
 # create a mapping from characters to integers
 stoi = {ch:i for i, ch in enumerate(chars)}
 itos = {i:ch for i, ch in enumerate(chars)}
-encode = lambda s: [stoi[c] for c in s] # encode: take a string, output a list f integers
+encode = lambda s: [stoi[c] for c in s] # encode: take a string, output a list of integers
 decode = lambda l: ''.join([itos[i] for i in l]) # decode: take a list of integers, output a string
 
 #print(encode("hi there"))
@@ -147,7 +147,7 @@ class Block(nn.Module):
         return x
 
 
-class BigramLanguageModel(nn.Module):
+class LanguageModel(nn.Module):
 
     def __init__(self):
         super().__init__()
@@ -195,7 +195,7 @@ class BigramLanguageModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         return idx
 
-model = BigramLanguageModel().to(device)
+model = LanguageModel().to(device)
 print(sum(p.numel() for p in model.parameters())(1e6, 'M parameters'))
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
